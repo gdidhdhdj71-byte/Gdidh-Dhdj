@@ -1,0 +1,6 @@
+{
+  "name": "Clock",
+  "description": "A beautifully designed cosmic dark clock app with current local time, custom World Clocks, Alarms list, live Stopwatch, and accurate Countdown Timers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
