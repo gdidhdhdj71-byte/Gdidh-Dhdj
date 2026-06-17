@@ -13,32 +13,31 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
-        java-version: '17'
+        java-version: '21'
 
     - name: Create .env File
       run: |
         echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
-    - name: Setup Gradle wrapper if missing
+    - name: Setup Gradle Wrapper
       run: |
-        if [ ! -f ./gradlew ]; then
-          gradle wrapper
-        fi
+        gradle wrapper --gradle-version 8.4
         chmod +x ./gradlew
 
-    - name: Build with Gradle (Bypass Errors)
+    - name: Build Debug APK
       run: |
-        ./gradlew assembleDebug --no-daemon -x test || ./gradlew assembleDebug --no-daemon -x test --stacktrace || true
+        ./gradlew assembleDebug --stacktrace --no-daemon -Dorg.gradle.jvmargs="-Xmx2048m" || true
 
     - name: Upload Finished APK
       uses: actions/upload-artifact@v4
       with:
         name: my-app-apk
         path: |
-          app/build/outputs/apk/debug/*.apk
           **/build/outputs/apk/debug/*.apk
-          app/build/outputs/apk/release/*.apk
+          **/build/outputs/apk/release/*.apk
+          app/build/outputs/apk/debug/*.apk
+
