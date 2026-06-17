@@ -1,4 +1,4 @@
-name: Build Gemini Android APK
+name: Universal Android Build
 
 on:
   push:
@@ -23,22 +23,15 @@ jobs:
       run: |
         echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
-    - name: Setup Gradle Wrapper inside Subfolder
+    - name: Build Android Project
       run: |
-        cd gemini-start
-        if [ ! -f ./gradlew ]; then
-          gradle wrapper
-        fi
-        chmod +x ./gradlew
+        chmod +x ./gradlew || true
+        ./gradlew assembleDebug --no-daemon -x test || ./gradlew :app:assembleDebug --no-daemon || ./gradlew :sample:assembleDebug --no-daemon || true
 
-    - name: Build Debug APK with Gradle
-      run: |
-        cd gemini-start
-        ./gradlew assembleDebug --no-daemon -x test || ./gradlew assemble --no-daemon -x test || true
-
-    - name: Find and Upload Finished APK
+    - name: Upload All Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: gemini-app-apk
+        name: gemini-app
         path: |
           **/*.apk
+          **/outputs/**/*.apk
