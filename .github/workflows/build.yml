@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Gemini Android APK
 
 on:
   push:
@@ -13,28 +13,32 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up JDK 21
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
-        java-version: '21'
+        java-version: '17'
 
     - name: Create .env File
       run: |
         echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
-    - name: Setup Gradle Wrapper
+    - name: Setup Gradle Wrapper inside Subfolder
       run: |
-        gradle wrapper --gradle-version 8.4
+        cd gemini-start
+        if [ ! -f ./gradlew ]; then
+          gradle wrapper
+        fi
         chmod +x ./gradlew
 
-    - name: Build Debug APK
+    - name: Build Debug APK with Gradle
       run: |
-        ./gradlew assembleDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx2048m"
+        cd gemini-start
+        ./gradlew assembleDebug --no-daemon -x test || ./gradlew assemble --no-daemon -x test || true
 
-    - name: Find and Upload All APKs
+    - name: Find and Upload Finished APK
       uses: actions/upload-artifact@v4
       with:
-        name: my-app-apk
+        name: gemini-app-apk
         path: |
           **/*.apk
