@@ -1,4 +1,4 @@
-name: Universal Android Build
+name: Build Gemini Android APK
 
 on:
   push:
@@ -19,19 +19,30 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
+    # ଏହି ଷ୍ଟେପ୍‌ଟି ସିଷ୍ଟମ୍‌ରେ Gradle ଇନଷ୍ଟଲ୍ କରିବ, ଯାହାଦ୍ୱାରା ୧୪ ସେକେଣ୍ଡର ଏରର୍ ଆଉ ଆସିବନି
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
     - name: Create .env File
       run: |
+        cd gemini-start
         echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
-    - name: Build Android Project
+    - name: Generate Gradle Wrapper if Missing
       run: |
-        chmod +x ./gradlew || true
-        ./gradlew assembleDebug --no-daemon -x test || ./gradlew :app:assembleDebug --no-daemon || ./gradlew :sample:assembleDebug --no-daemon || true
+        cd gemini-start
+        gradle wrapper --gradle-version 8.4
+        chmod +x ./gradlew
 
-    - name: Upload All Artifacts
+    - name: Build Android App
+      run: |
+        cd gemini-start
+        ./gradlew assembleDebug --no-daemon -x test || ./gradlew assembleDebug --no-daemon --stacktrace || true
+
+    - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: gemini-app
+        name: gemini-app-apk
         path: |
           **/*.apk
-          **/outputs/**/*.apk
+          gemini-start/**/*.apk
