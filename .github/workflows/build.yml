@@ -18,18 +18,21 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
-        cache: 'gradle'
 
     - name: Create .env File
       run: |
         echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
 
-    - name: Make Gradle Executable
-      run: chmod +x ./gradlew
+    - name: Setup Gradle wrapper if missing
+      run: |
+        if [ ! -f ./gradlew ]; then
+          echo "Gradle wrapper missing, generating..."
+          gradle wrapper
+        fi
+        chmod +x ./gradlew
 
     - name: Build with Gradle
-      run: |
-        ./gradlew assembleDebug --no-daemon -x test || gradle assembleDebug --no-daemon -x test
+      run: ./gradlew assembleDebug --no-daemon -x test
 
     - name: Upload Finished APK
       uses: actions/upload-artifact@v4
