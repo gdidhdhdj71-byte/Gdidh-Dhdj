@@ -18,8 +18,6 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
-
-    # ଏହି ଷ୍ଟେପ୍‌ଟି ସିଷ୍ଟମ୍‌ରେ Gradle ଇନଷ୍ଟଲ୍ କରିବ, ଯାହାଦ୍ୱାରା ୧୪ ସେକେଣ୍ଡର ଏରର୍ ଆଉ ଆସିବନି
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
